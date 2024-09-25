@@ -1,18 +1,146 @@
-/**
-  |============================
-  | include css partials with
-  | default @import url()
-  |============================
-*/
-/* Common styles */
 @import url('./reset.css');
-@import url('./base.css');
-@import url('./container.css');
-@import url('./animations.css');
 
-/* Sections style */
-@import url('./header.css');
-@import url('./vite-promo.css');
-@import url('./badges.css');
-@import url('./back-link.css');
-@import url('./footer.css');
+.loader {
+  display: inline-block;
+  font-size: 48px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  color: #000000;
+  position: relative;
+  margin-left: calc((100% - 196.5px) / 2);
+  margin-bottom: 20px;
+}
+
+.non-visible {
+  display: none;
+}
+
+.is-visible {
+  display: contents;
+}
+
+.loader::before {
+  content: '';
+  position: absolute;
+  left: 34px;
+  bottom: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 5px solid #FFF;
+  border-bottom-color: #FF3D00;
+  box-sizing: border-box;
+  animation: rotation 0.6s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.search-form {
+  display: flex;
+  margin-left: calc((100% - 272px) / 2);
+  gap: 8px;
+  margin-bottom: 32px;
+}
+
+.search-input {
+  border-radius: 4px;
+  width: 272px;
+  height: 40px;
+  background: #fff;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 16px;
+  box-sizing: border-box;
+  border: 1px solid #808080;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: #808080;
+  outline: none;
+}
+
+.search-input:hover {
+  border-color: #000000;
+}
+
+.search-input:focus {
+  border-color: #4E75FF;
+  color: #2e2f42;
+}
+
+.form-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  gap: 10px;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 75px;
+  height: 40px;
+  background: #4e75ff;
+  border: none;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.form-btn:hover {
+  background: #6C8CFF;
+}
+
+.gallery-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-right: calc((100% - 96px - 4 * 360px) / 2);
+  margin-left: calc((100% - 96px - 4 * 360px) / 2);
+}
+
+.img-card {
+  border: 1px solid #808080;
+  width: 360px;
+  height: 248px;
+}
+
+.img-card img {
+  width: 360px;
+  height: 200px;
+}
+
+.img-card ul {
+  display: flex;
+  padding: 4px 20px;
+  gap: 20px;
+}
+
+.img-card li {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  justify-content: center;
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 2;
+  letter-spacing: 0.04em;
+  color: #2e2f42;
+}
+
+.img-card h3 {
+  font-weight: 600;
+  line-height: 1.33;
+}
