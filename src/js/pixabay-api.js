@@ -12,6 +12,7 @@ export async function searchFetch(searchValue, page) {
     });
     try {
         const response = await axios.get(`https://pixabay.com/api/?${params}`);
+        console.log(response.data);
         return response.data;
     }
     catch(error) {

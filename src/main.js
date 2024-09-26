@@ -22,6 +22,7 @@ const galleryGrid = new SimpleLightbox('.gallery-section a', {
 });
 let page = 1;
 let userSearch = "";
+let totalHits = 0;
 
 function handleSearch(event) {
     event.preventDefault();
@@ -59,6 +60,7 @@ function handleSearch(event) {
                     loaderEl.classList.replace("is-visible", "non-visible");
                     fetchPostsBtn.classList.replace("non-visible", "is-visible");
                     userSearch = searchValue;
+                    totalHits = images.totalHits;
                     divEl.insertAdjacentElement("afterend", loaderEl);
                 }
             })
@@ -71,12 +73,10 @@ formEl.addEventListener("submit", () => handleSearch(event));
 fetchPostsBtn.addEventListener("click", async () => {
     try {
         loaderEl.classList.replace("non-visible", "is-visible");
+        let elementPerPage = 15;
+        const totalPages = Math.ceil(totalHits / elementPerPage);
         page += 1;
-        const gallery = await searchFetch(userSearch, page);
-        loaderEl.classList.replace("is-visible", "non-visible");
-        if (gallery.hits.length < 15) {
-            divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
-            galleryGrid.refresh();
+        if (page > totalPages) {
             iziToast.error({
                 backgroundColor: "#EF4040",
                 progressBarColor: "#FFBEBE",
@@ -86,9 +86,12 @@ fetchPostsBtn.addEventListener("click", async () => {
                 position: `topRight`,
                 message: "We're sorry, but you've reached the end of search results.",
             })
+            loaderEl.classList.replace("is-visible", "non-visible");
             fetchPostsBtn.classList.replace("is-visible", "non-visible");
             return;
         }
+        const gallery = await searchFetch(userSearch, page);
+        loaderEl.classList.replace("is-visible", "non-visible");
         divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
         const galleryBox = document.querySelector(".img-card");
         const imgCardHeight = 2 * galleryBox.getBoundingClientRect().height;
