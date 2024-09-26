@@ -5,8 +5,8 @@ import "simplelightbox/dist/simple-lightbox.min.css";
 import axios from "axios";
 import { searchFetch } from "./js/pixabay-api.js";
 import { createGallery } from "./js/render-functions.js";
-export const divEl = document.querySelector(".gallery-section");
 
+export const divEl = document.querySelector(".gallery-section");
 const fetchPostsBtn = document.querySelector(".load-btn");
 const formEl = document.querySelector("form");
 const inputEl = formEl.elements.input;
@@ -52,19 +52,13 @@ function handleSearch(event) {
                         message: "Sorry, there are no images matching your search query. Please try again!",
                     });
                     loaderEl.classList.replace("is-visible", "non-visible");
-                    return
+                    return;
                 } else {
                     divEl.insertAdjacentHTML("beforeend", createGallery(images.hits));
                     galleryGrid.refresh();
                     loaderEl.classList.replace("is-visible", "non-visible");
                     fetchPostsBtn.classList.replace("non-visible", "is-visible");
                     userSearch = searchValue;
-                    const galleryBox = document.querySelector(".img-card");
-                    const windowHeight = 2 * galleryBox.getBoundingClientRect().height;
-                    window.scrollBy({
-                        top: windowHeight,
-                        behavior: "smooth",
-                    });
                 }
             })
             .catch(error => console.log(error));
@@ -72,10 +66,14 @@ function handleSearch(event) {
 }
 
 formEl.addEventListener("submit", () => handleSearch(event));
+
 fetchPostsBtn.addEventListener("click", async () => {
     try {
+        divEl.append(loaderEl);
+        loaderEl.classList.replace("non-visible", "is-visible");
         page += 1;
         const gallery = await searchFetch(userSearch, page);
+        loaderEl.classList.replace("is-visible", "non-visible");
         if (gallery.hits.length < 15) {
             divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
             galleryGrid.refresh();
@@ -92,6 +90,13 @@ fetchPostsBtn.addEventListener("click", async () => {
             return;
         }
         divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
+        const galleryBox = document.querySelector(".img-card");
+        const imgCardHeight = 2 * galleryBox.getBoundingClientRect().height;
+        window.scrollBy({
+            top: imgCardHeight,
+            left: 0,
+            behavior: "smooth",
+        });
         galleryGrid.refresh();
     } catch (error) {
         console.log(error);
