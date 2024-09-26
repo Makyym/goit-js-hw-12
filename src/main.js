@@ -59,6 +59,7 @@ function handleSearch(event) {
                     loaderEl.classList.replace("is-visible", "non-visible");
                     fetchPostsBtn.classList.replace("non-visible", "is-visible");
                     userSearch = searchValue;
+                    divEl.insertAdjacentElement("afterend", loaderEl);
                 }
             })
             .catch(error => console.log(error));
@@ -69,7 +70,6 @@ formEl.addEventListener("submit", () => handleSearch(event));
 
 fetchPostsBtn.addEventListener("click", async () => {
     try {
-        divEl.append(loaderEl);
         loaderEl.classList.replace("non-visible", "is-visible");
         page += 1;
         const gallery = await searchFetch(userSearch, page);
