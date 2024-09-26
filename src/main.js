@@ -1,10 +1,13 @@
-import { searchFetch } from "./js/pixabay-api.js";
-import { createGallery } from "./js/render-functions.js";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
+import axios from "axios";
+import { searchFetch } from "./js/pixabay-api.js";
+import { createGallery } from "./js/render-functions.js";
 export const divEl = document.querySelector(".gallery-section");
+
+const fetchPostsBtn = document.querySelector(".load-btn");
 const formEl = document.querySelector("form");
 const inputEl = formEl.elements.input;
 const buttonEl = formEl.elements.button;
@@ -17,6 +20,8 @@ const galleryGrid = new SimpleLightbox('.gallery-section a', {
     captionPosition: 'bottom',
     captionDelay: 250,
 });
+let page = 1;
+let userSearch = "";
 
 function handleSearch(event) {
     event.preventDefault();
@@ -34,7 +39,7 @@ function handleSearch(event) {
         divEl.textContent = "";
         loaderEl.classList.replace("non-visible", "is-visible");
         const searchValue = inputEl.value.trim();
-        searchFetch(searchValue)
+        searchFetch(searchValue, page)
             .then(images => {
                 if (images.hits.length === 0) {
                     iziToast.error({
@@ -52,6 +57,14 @@ function handleSearch(event) {
                     divEl.insertAdjacentHTML("beforeend", createGallery(images.hits));
                     galleryGrid.refresh();
                     loaderEl.classList.replace("is-visible", "non-visible");
+                    fetchPostsBtn.classList.replace("non-visible", "is-visible");
+                    userSearch = searchValue;
+                    const galleryBox = document.querySelector(".img-card");
+                    const windowHeight = 2 * galleryBox.getBoundingClientRect().height;
+                    window.scrollBy({
+                        top: windowHeight,
+                        behavior: "smooth",
+                    });
                 }
             })
             .catch(error => console.log(error));
@@ -59,3 +72,28 @@ function handleSearch(event) {
 }
 
 formEl.addEventListener("submit", () => handleSearch(event));
+fetchPostsBtn.addEventListener("click", async () => {
+    try {
+        page += 1;
+        const gallery = await searchFetch(userSearch, page);
+        if (gallery.hits.length < 15) {
+            divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
+            galleryGrid.refresh();
+            iziToast.error({
+                backgroundColor: "#EF4040",
+                progressBarColor: "#FFBEBE",
+                position: "topCenter",
+                messageColor: "#FFFFFF",
+                icon: false,
+                position: `topRight`,
+                message: "We're sorry, but you've reached the end of search results.",
+            })
+            fetchPostsBtn.classList.replace("is-visible", "non-visible");
+            return;
+        }
+        divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
+        galleryGrid.refresh();
+    } catch (error) {
+        console.log(error);
+    }
+});

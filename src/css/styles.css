@@ -144,3 +144,9 @@
   font-weight: 600;
   line-height: 1.33;
 }
+
+.load-btn button {
+  margin-left: calc((100% - 107px) / 2);
+  margin-top: 20px;
+  box-sizing: content-box;
+}
