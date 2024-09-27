@@ -26,6 +26,8 @@ let totalHits = 0;
 
 function handleSearch(event) {
     event.preventDefault();
+    page = 1;
+    fetchPostsBtn.classList.replace("is-visible", "non-visible");
     if (inputEl.value.trim() === "") {
         iziToast.error({
             backgroundColor: "#EF4040",
@@ -58,10 +60,23 @@ function handleSearch(event) {
                     divEl.insertAdjacentHTML("beforeend", createGallery(images.hits));
                     galleryGrid.refresh();
                     loaderEl.classList.replace("is-visible", "non-visible");
-                    fetchPostsBtn.classList.replace("non-visible", "is-visible");
                     userSearch = searchValue;
                     totalHits = images.totalHits;
                     divEl.insertAdjacentElement("afterend", loaderEl);
+                    if (totalHits < 15) {
+                        iziToast.error({
+                            backgroundColor: "#EF4040",
+                            progressBarColor: "#FFBEBE",
+                            position: "topCenter",
+                            messageColor: "#FFFFFF",
+                            icon: false,
+                            position: `topRight`,
+                            message: "We're sorry, but you've reached the end of search results.",
+                        })
+                        fetchPostsBtn.classList.replace("is-visible", "non-visible");
+                        return
+                    };
+                    fetchPostsBtn.classList.replace("non-visible", "is-visible");
                 }
             })
             .catch(error => console.log(error));
@@ -76,20 +91,9 @@ fetchPostsBtn.addEventListener("click", async () => {
         let elementPerPage = 15;
         const totalPages = Math.ceil(totalHits / elementPerPage);
         page += 1;
-        if (page > totalPages) {
-            iziToast.error({
-                backgroundColor: "#EF4040",
-                progressBarColor: "#FFBEBE",
-                position: "topCenter",
-                messageColor: "#FFFFFF",
-                icon: false,
-                position: `topRight`,
-                message: "We're sorry, but you've reached the end of search results.",
-            })
-            loaderEl.classList.replace("is-visible", "non-visible");
-            fetchPostsBtn.classList.replace("is-visible", "non-visible");
-            return;
-        }
+        console.log(totalPages);
+        console.log(page);
+        console.log(totalHits);
         const gallery = await searchFetch(userSearch, page);
         loaderEl.classList.replace("is-visible", "non-visible");
         divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
@@ -101,6 +105,19 @@ fetchPostsBtn.addEventListener("click", async () => {
             behavior: "smooth",
         });
         galleryGrid.refresh();
+        if (page === totalPages) {
+            iziToast.error({
+                backgroundColor: "#EF4040",
+                progressBarColor: "#FFBEBE",
+                position: "topCenter",
+                messageColor: "#FFFFFF",
+                icon: false,
+                position: `topRight`,
+                message: "We're sorry, but you've reached the end of search results.",
+            })
+            fetchPostsBtn.classList.replace("is-visible", "non-visible");
+            return;
+        }
     } catch (error) {
         console.log(error);
     }
