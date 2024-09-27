@@ -24,7 +24,7 @@ let page = 1;
 let userSearch = "";
 let totalHits = 0;
 
-function handleSearch(event) {
+async function handleSearch(event) {
     event.preventDefault();
     page = 1;
     fetchPostsBtn.classList.replace("is-visible", "non-visible");
@@ -42,9 +42,28 @@ function handleSearch(event) {
         divEl.textContent = "";
         loaderEl.classList.replace("non-visible", "is-visible");
         const searchValue = inputEl.value.trim();
-        searchFetch(searchValue, page)
-            .then(images => {
-                if (images.hits.length === 0) {
+        try {
+            let data = await searchFetch(searchValue, page);
+            if (data.hits.length === 0) {
+                iziToast.error({
+                    backgroundColor: "#EF4040",
+                    progressBarColor: "#FFBEBE",
+                    position: "topCenter",
+                    messageColor: "#FFFFFF",
+                    icon: false,
+                    position: `topRight`,
+                    message: "Sorry, there are no images matching your search query. Please try again!",
+                });
+                loaderEl.classList.replace("is-visible", "non-visible");
+                return;
+            } else {
+                divEl.insertAdjacentHTML("beforeend", createGallery(data.hits));
+                galleryGrid.refresh();
+                loaderEl.classList.replace("is-visible", "non-visible");
+                userSearch = searchValue;
+                totalHits = data.totalHits;
+                divEl.insertAdjacentElement("afterend", loaderEl);
+                if (totalHits < 15) {
                     iziToast.error({
                         backgroundColor: "#EF4040",
                         progressBarColor: "#FFBEBE",
@@ -52,36 +71,19 @@ function handleSearch(event) {
                         messageColor: "#FFFFFF",
                         icon: false,
                         position: `topRight`,
-                        message: "Sorry, there are no images matching your search query. Please try again!",
+                        message: "We're sorry, but you've reached the end of search results.",
                     });
-                    loaderEl.classList.replace("is-visible", "non-visible");
+                    fetchPostsBtn.classList.replace("is-visible", "non-visible");
                     return;
-                } else {
-                    divEl.insertAdjacentHTML("beforeend", createGallery(images.hits));
-                    galleryGrid.refresh();
-                    loaderEl.classList.replace("is-visible", "non-visible");
-                    userSearch = searchValue;
-                    totalHits = images.totalHits;
-                    divEl.insertAdjacentElement("afterend", loaderEl);
-                    if (totalHits < 15) {
-                        iziToast.error({
-                            backgroundColor: "#EF4040",
-                            progressBarColor: "#FFBEBE",
-                            position: "topCenter",
-                            messageColor: "#FFFFFF",
-                            icon: false,
-                            position: `topRight`,
-                            message: "We're sorry, but you've reached the end of search results.",
-                        })
-                        fetchPostsBtn.classList.replace("is-visible", "non-visible");
-                        return
-                    };
-                    fetchPostsBtn.classList.replace("non-visible", "is-visible");
                 }
-            })
-            .catch(error => console.log(error));
-    };
+                fetchPostsBtn.classList.replace("non-visible", "is-visible");
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 }
+
 
 formEl.addEventListener("submit", () => handleSearch(event));
 
