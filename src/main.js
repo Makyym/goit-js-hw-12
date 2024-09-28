@@ -93,9 +93,6 @@ fetchPostsBtn.addEventListener("click", async () => {
         let elementPerPage = 15;
         const totalPages = Math.ceil(totalHits / elementPerPage);
         page += 1;
-        console.log(totalPages);
-        console.log(page);
-        console.log(totalHits);
         const gallery = await searchFetch(userSearch, page);
         loaderEl.classList.replace("is-visible", "non-visible");
         divEl.insertAdjacentHTML("beforeend", createGallery(gallery.hits));
